@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#F3FAFD">
+<title>מעקב תרופות</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@400;500;700&display=swap">
+<style>
+/* Layout: a very light sky-blue page with a faint sea wash and soap bubbles drifting behind frosted-glass cards, plus a soft wave along the bottom edge. Each dose card leads with a line-drawn sunrise, sun, sunset or moon, chosen by the hour. Moss green is the only accent. */
+:root{
+  --bg:#F3FAFD;
+  --surface:#FFFFFF;
+  --glass:rgba(255,255,255,.88);
+  --surface-2:#E4F0F5;
+  --ink:#1B2A2E;
+  --muted:#566B72;
+  --line:#D9E8EE;
+  --accent:#37694F;
+  --accent-ink:#FFFFFF;
+  --accent-soft:#E0EEE6;
+  --warn:#7A500D;
+  --warn-soft:#F6E9C4;
+  --tile:#EFF7FA;
+  --wash:rgba(150,205,225,.24);
+  --wave-1:rgba(110,185,210,.24);
+  --wave-2:rgba(110,185,210,.13);
+  --bub-s:rgba(70,150,175,.5);
+  --bub-h:#FFFFFF;
+  --bub-h2:rgba(255,255,255,.85);
+  --bub-c0:rgba(170,225,235,.16);
+  --bub-c1:rgba(130,205,225,.24);
+  --bub-c2:rgba(170,215,170,.3);
+  --bub-c3:rgba(235,225,150,.34);
+  --bub-glow:rgba(110,190,215,.35);
+  --bub-drop:rgba(60,120,130,.16);
+  --font-display:'Frank Ruhl Libre','Heebo',Georgia,'Arial Hebrew',serif;
+  --font-body:'Heebo',system-ui,'Arial Hebrew',Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1A1F;--surface:#16252B;--glass:rgba(22,37,43,.88);--surface-2:#1F3239;--ink:#E6F0F2;--muted:#9DB3BA;--line:#2A3F47;
+    --accent:#86C4A0;--accent-ink:#0D1F15;--accent-soft:#1F3A2E;--warn:#E3B968;--warn-soft:#3A2F15;--tile:#1B2D33;
+    --wash:rgba(100,170,190,.1);--wave-1:rgba(100,170,190,.14);--wave-2:rgba(100,170,190,.08);
+    --bub-s:rgba(150,215,225,.45);--bub-h:rgba(255,255,255,.7);--bub-h2:rgba(255,255,255,.4);
+    --bub-c0:rgba(150,215,225,.06);--bub-c1:rgba(130,205,225,.16);--bub-c2:rgba(170,225,180,.2);--bub-c3:rgba(235,225,150,.2);
+    --bub-glow:rgba(130,205,225,.3);--bub-drop:rgba(0,0,0,.3);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1A1F;--surface:#16252B;--glass:rgba(22,37,43,.88);--surface-2:#1F3239;--ink:#E6F0F2;--muted:#9DB3BA;--line:#2A3F47;
+  --accent:#86C4A0;--accent-ink:#0D1F15;--accent-soft:#1F3A2E;--warn:#E3B968;--warn-soft:#3A2F15;--tile:#1B2D33;
+  --wash:rgba(100,170,190,.1);--wave-1:rgba(100,170,190,.14);--wave-2:rgba(100,170,190,.08);
+  --bub-s:rgba(150,215,225,.45);--bub-h:rgba(255,255,255,.7);--bub-h2:rgba(255,255,255,.4);
+  --bub-c0:rgba(150,215,225,.06);--bub-c1:rgba(130,205,225,.16);--bub-c2:rgba(170,225,180,.2);--bub-c3:rgba(235,225,150,.2);
+  --bub-glow:rgba(130,205,225,.3);--bub-drop:rgba(0,0,0,.3);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.45 var(--font-body);-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;text-align:start;-webkit-tap-highlight-color:transparent}
+button:disabled{cursor:default}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.sea{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:linear-gradient(180deg,transparent 50%,var(--wash) 100%)}
+.bb{position:absolute;border-radius:50%;border:1.5px solid var(--bub-s);
+  background:
+    radial-gradient(circle at 28% 24%,var(--bub-h) 0 7%,transparent 16%),
+    radial-gradient(circle at 74% 80%,var(--bub-h2) 0 5%,transparent 13%),
+    radial-gradient(circle at 50% 50%,var(--bub-c0) 0 50%,var(--bub-c1) 72%,var(--bub-c2) 89%,var(--bub-c3) 100%);
+  box-shadow:inset 0 0 10px var(--bub-glow),0 3px 8px var(--bub-drop);
+  animation:drift 9s ease-in-out infinite}
+@keyframes drift{0%,100%{transform:translate(0,0)}50%{transform:translate(6px,-18px)}}
+.waves{position:absolute;left:0;bottom:0;width:100%;height:84px;display:block}
+.w1{fill:var(--wave-1)}
+.w2{fill:var(--wave-2)}
+.wrap{position:relative;z-index:1;max-width:560px;margin:0 auto;padding-block:14px 40px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* header */
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.greet{font-size:15px;color:var(--muted)}
+.day-no{font:500 38px/1.1 var(--font-display);letter-spacing:-.01em}
+.day-of{font:400 16px var(--font-body);color:var(--muted);margin-inline-start:10px}
+.date{color:var(--muted);margin-top:2px}
+.clock{font:400 22px var(--font-display);color:var(--muted);font-variant-numeric:tabular-nums}
+.cnt{margin-top:2px;font-size:13px;color:var(--muted);text-align:end}
+
+/* switch */
+.seg{display:grid;grid-template-columns:1fr 1fr;margin:18px 0 4px;border-bottom:1px solid var(--line)}
+.seg button{min-height:48px;text-align:center;font-weight:500;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px}
+.seg button[aria-selected="true"]{color:var(--ink);font-weight:700;border-bottom-color:var(--accent)}
+.seg .mb{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;margin-inline-start:8px;border-radius:999px;background:var(--warn-soft);color:var(--warn);font-size:12px;font-weight:700;vertical-align:middle}
+
+.stack{display:flex;flex-direction:column;gap:12px}
+.lead{margin-top:16px}
+.sec{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:20px 2px 10px;font:700 14px var(--font-body);color:var(--muted)}
+.sec h2{margin:0;font:inherit}
+
+/* notes and alerts */
+.note{margin-top:16px;padding:16px;border-radius:18px;background:var(--accent-soft)}
+.note b{display:block;font:500 21px var(--font-display);margin-bottom:2px}
+.link{min-height:44px;padding:0 6px;color:var(--muted);text-decoration:underline;text-underline-offset:3px;font-size:14px}
+
+/* dose card */
+.slot{background:var(--glass);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.slot.due{border:1.5px solid var(--accent)}
+.slot.done{background:var(--accent-soft);border-color:transparent}
+.head{display:flex;align-items:center;gap:14px;width:100%;padding:14px}
+button.head{min-height:76px}
+.gl{width:48px;height:48px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none}
+.gl svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.done .gl{background:var(--accent);color:var(--accent-ink)}
+.done .gl svg{stroke-width:2.4}
+.meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.time{font:500 26px/1.15 var(--font-display);font-variant-numeric:tabular-nums;text-align:right}
+.done .time{font-size:21px;color:var(--muted)}
+.lbl{font-size:15px;color:var(--muted)}
+.sub{font-size:14px;color:var(--muted)}
+.end{display:flex;align-items:center;gap:8px;flex:none;color:var(--muted);font-size:14px}
+.badge{padding:3px 12px;border-radius:999px;font-weight:700;font-size:13px;background:var(--accent-soft);color:var(--accent)}
+.chev{width:18px;height:18px;transition:transform .15s}
+.open .chev{transform:rotate(180deg)}
+
+.pills{border-top:1px solid var(--line)}
+.done .pills{border-top-color:rgba(90,130,105,.25)}
+.pill{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;width:100%;padding:12px 14px;min-height:76px}
+.pill + .pill{border-top:1px solid var(--line)}
+.done .pill + .pill{border-top-color:rgba(90,130,105,.25)}
+.tile{width:74px;height:58px;border-radius:14px;background:var(--tile);display:flex;align-items:center;justify-content:center;flex:none}
+.tile svg{width:40px;height:40px;flex:none}
+.tile svg + svg{margin-inline-start:-11px}
+.ptxt{min-width:0;display:flex;flex-direction:column;gap:1px}
+.pn{font:700 16px var(--font-body);overflow-wrap:anywhere}
+.pd{font-size:14px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chip{font-size:12px;padding:2px 9px;border-radius:999px;background:var(--surface-2);color:var(--ink)}
+.chk{width:32px;height:32px;border-radius:50%;border:2px solid var(--muted);color:transparent;display:grid;place-items:center;flex:none}
+.chk svg{width:17px;height:17px}
+.pill.on .chk{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.pill.on .tile{opacity:.7}
+.pill:disabled .chk{opacity:.35}
+.foot{padding:12px 14px 16px;display:flex;justify-content:center}
+.btn{display:block;width:100%;min-height:54px;border-radius:14px;background:var(--accent);color:var(--accent-ink);font:700 17px var(--font-body);text-align:center}
+.btn:active{filter:brightness(.9)}
+
+/* day strip */
+.strip{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px}
+.dc{display:flex;flex-direction:column;align-items:center;gap:1px;min-height:72px;padding:8px 2px;border-radius:14px;border:1px solid var(--line);background:var(--glass);text-align:center;justify-content:center}
+.dc .n{font:500 22px/1.1 var(--font-display)}
+.dc .d{font-size:12px;color:var(--muted)}
+.dc .c{font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.dc.full{background:var(--accent-soft);border-color:transparent}
+.dc.full .c{color:var(--accent)}
+.dc.missed{background:var(--warn-soft);border-color:transparent}
+.dc.missed .c{color:var(--warn)}
+.dc.future{background:transparent;border-style:dashed;color:var(--muted)}
+.dc.today{border:2px solid var(--accent)}
+.dc[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:2px}
+.dayhead{margin:24px 2px 10px}
+.dayhead h2{margin:0;font:500 28px var(--font-display)}
+.dayhead p{margin:2px 0 0;color:var(--muted);font-size:14px}
+
+.fine{margin:30px 2px 0;font-size:13px;color:var(--muted)}
+.fine p{margin:0 0 6px}
+@media (prefers-reduced-motion: reduce){.chev{transition:none}.bb{animation:none!important}}
+</style>
+</head><body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="ic-oval" viewBox="0 0 48 48">
+      <rect x="4" y="13" width="40" height="22" rx="11" fill="#C3B8DA" stroke="#6F5F95" stroke-width="1.8"/>
+      <path d="M11 20c3-2.4 8-3 13-3" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2.4" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="ic-round" viewBox="0 0 48 48">
+      <circle cx="24" cy="24" r="16" fill="#EBCFCB" stroke="#A17772" stroke-width="1.8"/>
+      <path d="M9 24h30" stroke="#A17772" stroke-opacity=".55" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M14 16c3-3 7-4.5 11-4.5" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2.4" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="ic-white" viewBox="0 0 48 48">
+      <circle cx="24" cy="24" r="16" fill="#FFFFFF" stroke="#7C8F8A" stroke-width="1.8"/>
+      <path d="M9 24h30" stroke="#7C8F8A" stroke-opacity=".7" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M14 16c3-3 7-4.5 11-4.5" fill="none" stroke="#C9D5D1" stroke-width="2.4" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="ic-cap" viewBox="0 0 48 48">
+      <g transform="rotate(-35 24 24)" stroke="#1B1B1B" stroke-width="1.8" stroke-linejoin="round">
+        <path d="M24 15H14a9 9 0 0 0 0 18h10z" fill="#EE7F2D"/>
+        <path d="M24 15h10a9 9 0 0 1 0 18H24z" fill="#2B2B2B"/>
+        <path d="M11 20h7" stroke="#fff" stroke-opacity=".6" stroke-width="2.4" stroke-linecap="round"/>
+      </g>
+    </symbol>
+    <symbol id="ic-probio" viewBox="0 0 48 48">
+      <g transform="rotate(-35 24 24)" stroke="#3E6F86" stroke-width="1.8" stroke-linejoin="round">
+        <path d="M24 15H14a9 9 0 0 0 0 18h10z" fill="#6FA3BD"/>
+        <path d="M24 15h10a9 9 0 0 1 0 18H24z" fill="#FFFFFF"/>
+        <path d="M11 20h7" stroke="#fff" stroke-opacity=".6" stroke-width="2.4" stroke-linecap="round"/>
+      </g>
+    </symbol>
+    <symbol id="ic-sun" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="4.5"/>
+      <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>
+    </symbol>
+    <symbol id="ic-sunrise" viewBox="0 0 24 24">
+      <path d="M17 17a5 5 0 0 0-10 0M12 5v4M4.9 10.2l1.4 1.4M19.1 10.2l-1.4 1.4M2 17h2M20 17h2M2 21h20M9 7l3-3 3 3"/>
+    </symbol>
+    <symbol id="ic-sunset" viewBox="0 0 24 24">
+      <path d="M17 17a5 5 0 0 0-10 0M12 5v4M4.9 10.2l1.4 1.4M19.1 10.2l-1.4 1.4M2 17h2M20 17h2M2 21h20M9 4l3 3 3-3"/>
+    </symbol>
+    <symbol id="ic-moon" viewBox="0 0 24 24">
+      <path d="M20 14.2A8 8 0 1 1 9.8 4a6.4 6.4 0 0 0 10.2 10.2z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="sea" aria-hidden="true">
+  <i class="bb" style="left:5%;top:9%;width:56px;height:56px;animation-duration:7s;animation-delay:0s"></i>
+  <i class="bb" style="left:86%;top:5%;width:22px;height:22px;animation-duration:8s;animation-delay:-4s"></i>
+  <i class="bb" style="left:17%;top:23%;width:14px;height:14px;animation-duration:9s;animation-delay:-8s"></i>
+  <i class="bb" style="left:89%;top:19%;width:46px;height:46px;animation-duration:10s;animation-delay:-3s"></i>
+  <i class="bb" style="left:2%;top:39%;width:30px;height:30px;animation-duration:11s;animation-delay:-7s"></i>
+  <i class="bb" style="left:92%;top:41%;width:18px;height:18px;animation-duration:12s;animation-delay:-2s"></i>
+  <i class="bb" style="left:8%;top:57%;width:68px;height:68px;animation-duration:7s;animation-delay:-6s"></i>
+  <i class="bb" style="left:93%;top:55%;width:32px;height:32px;animation-duration:8s;animation-delay:-1s"></i>
+  <i class="bb" style="left:2%;top:75%;width:20px;height:20px;animation-duration:9s;animation-delay:-5s"></i>
+  <i class="bb" style="left:83%;top:71%;width:58px;height:58px;animation-duration:10s;animation-delay:0s"></i>
+  <i class="bb" style="left:24%;top:87%;width:26px;height:26px;animation-duration:11s;animation-delay:-4s"></i>
+  <i class="bb" style="left:68%;top:89%;width:18px;height:18px;animation-duration:12s;animation-delay:-8s"></i>
+  <i class="bb" style="left:48%;top:3%;width:14px;height:14px;animation-duration:7s;animation-delay:-3s"></i>
+  <i class="bb" style="left:78%;top:13%;width:12px;height:12px;animation-duration:8s;animation-delay:-7s"></i>
+  <i class="bb" style="left:32%;top:69%;width:12px;height:12px;animation-duration:9s;animation-delay:-2s"></i>
+  <i class="bb" style="left:61%;top:33%;width:10px;height:10px;animation-duration:10s;animation-delay:-6s"></i>
+  <i class="bb" style="left:45%;top:55%;width:9px;height:9px;animation-duration:11s;animation-delay:-1s"></i>
+  <i class="bb" style="left:14%;top:44%;width:10px;height:10px;animation-duration:12s;animation-delay:-5s"></i>
+  <svg class="waves" viewBox="0 0 400 84" preserveAspectRatio="none">
+    <path class="w2" d="M0 40Q50 20 100 40T200 40T300 40T400 40V84H0Z"/>
+    <path class="w1" d="M0 56Q50 38 100 56T200 56T300 56T400 56V84H0Z"/>
+  </svg>
+</div>
+
+<div class="wrap" id="app" dir="rtl" lang="he"><div id="head"></div><div id="root"></div><div class="fine"><p id="dbg" dir="ltr"></p></div></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- schedule ---------- */
+var START='2026-10-15';        // day 1 (treatment began at lunch)
+var DAYS=15;                   // 15 days: 15.10 to 29.10
+var FIRST_FROM='13:30';        // day 1 begins with the lunch-time slots
+
+var PILLS={
+  esom:{name:'Esomeprazole',dose:'טבליה אחת · 40 מ״ג',icon:'oval',n:1},
+  bis:{name:'Bismuth (קל בטן)',dose:'טבליה אחת',icon:'round',n:1},
+  met:{name:'Metronidazole',dose:'2 טבליות · סה״כ 500 מ״ג',icon:'white',n:2},
+  tet:{name:'Tetracycline',dose:'2 קפסולות · סה״כ 500 מ״ג',icon:'cap',n:2},
+  pro:{name:'פרוביוטיק',dose:'כדור אחד',icon:'probio',n:1}
+};
+var AFTER='אחרי האוכל', WATER='עם כוס מלאה מים', BEFORE='חצי שעה לפני האוכל';
+var SLOTS=[
+  {id:'s0800',t:'08:00',label:'לפני הארוחה הראשונה',pills:[{p:'esom',notes:[BEFORE]}]},
+  {id:'s0830',t:'08:30',label:'ארוחה ראשונה',pills:[{p:'bis',notes:[AFTER]},{p:'tet',notes:[AFTER,WATER]}]},
+  {id:'s1200',t:'12:00',label:'ארוחה שנייה',pills:[{p:'bis',notes:[AFTER]},{p:'tet',notes:[AFTER,WATER]}]},
+  {id:'s1330',t:'13:30',label:'לפני הארוחה השלישית',pills:[{p:'esom',notes:[BEFORE]}]},
+  {id:'s1400',t:'14:00',label:'ארוחה שלישית',pills:[{p:'bis',notes:[AFTER]},{p:'met',notes:[AFTER]},{p:'tet',notes:[AFTER,WATER]}]},
+  {id:'s1630',t:'16:30',label:'שעתיים וחצי אחרי ארוחת הצהריים',pills:[{p:'pro',notes:[]}]},
+  {id:'s1800',t:'18:00',label:'ארוחה אחרונה',pills:[{p:'bis',notes:[AFTER]},{p:'met',notes:[AFTER],from:'2026-10-16'},{p:'tet',notes:[AFTER,WATER]}]},
+  {id:'s2030',t:'20:30',label:'שעתיים וחצי אחרי ארוחת הערב',pills:[{p:'pro',notes:[]}]}
+];
+
+/* ---------- dates ---------- */
+function pad(n){return n<10?'0'+n:''+n}
+function keyOf(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function parseKey(k){var a=k.split('-');return new Date(+a[0],+a[1]-1,+a[2])}
+function dayKeyAt(i){var d=parseKey(START);d.setDate(d.getDate()+i);return keyOf(d)}
+function dayIdx(k){var a=parseKey(START),b=parseKey(k);
+  return Math.round((Date.UTC(b.getFullYear(),b.getMonth(),b.getDate())-Date.UTC(a.getFullYear(),a.getMonth(),a.getDate()))/864e5)}
+function hm(d){return pad(d.getHours())+':'+pad(d.getMinutes())}
+function mins(t){var a=t.split(':');return (+a[0])*60+(+a[1])}
+function shortDate(k){var a=k.split('-');return (+a[2])+'.'+(+a[1])}
+function ltr(s){return '<bdi dir="ltr">'+s+'</bdi>'}
+function dur(m){
+  if(m<60)return m+' דק׳';
+  var h=Math.floor(m/60),r=m%60;
+  return r?h+' שע׳ ו־'+r+' דק׳':h+' שע׳';
+}
+function glyph(t){var m=mins(t);return m<600?'sunrise':(m<900?'sun':(m<1140?'sunset':'moon'))}
+
+/* ---------- state + persistence ---------- */
+var LS='meds-days-v1';
+function loadLocal(){try{var r=localStorage.getItem(LS);return r?JSON.parse(r):{}}catch(e){return {}}}
+function saveLocal(){try{localStorage.setItem(LS,JSON.stringify(state.days))}catch(e){}}
+var state={days:loadLocal()};
+var tab='now', sel=null, expanded={}, armed=null, armTimer=null;
+var recent={}, lastHead='', lastRoot='';
+var failed={}, db=null, pending=0, chain={}, dirty={}, firstSync=false, sync='local', lastSig='';
+
+function dbg(t){var x=document.getElementById('dbg');if(x)x.textContent=t}
+function setSync(s){
+  sync=s;
+  var el=document.getElementById('sync');
+  if(el)el.textContent=syncText();
+}
+function syncText(){return sync==='cloud'?'נשמר בענן':'נשמר במכשיר הזה בלבד'}
+
+function queueWrite(k){
+  if(!db)return;
+  pending++;
+  chain[k]=(chain[k]||Promise.resolve()).then(function(){
+    var w=db.doc('days/'+k).set({taken:state.days[k]||{}});
+    var t=new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'))},10000)});
+    return Promise.race([w,t]);
+  }).then(function(){pending--;delete failed[k];setSync('cloud')},function(err){pending--;failed[k]=1;setSync('local');dbg('save failed: '+(err&&err.message||err))});
+}
+function connect(d){
+  db=d;
+  d.collection('days').onSnapshot(function(snap){
+    if(pending>0)return;
+    if(snap.metadata&&snap.metadata.fromCache)return;
+    var remote={};
+    snap.docs.forEach(function(doc){var v=doc.data();remote[doc.id]=(v&&v.taken)||{}});
+    var push=[];
+    if(!firstSync){
+      firstSync=true;
+      Object.keys(state.days).forEach(function(k){
+        var local=state.days[k]||{};
+        if(dirty[k]||(!(k in remote)&&Object.keys(local).length)){remote[k]=local;push.push(k)}
+      });
+      dirty={};
+    }
+    Object.keys(failed).forEach(function(k){if(state.days[k]){remote[k]=state.days[k];if(push.indexOf(k)<0)push.push(k)}});
+    state.days=remote;
+    saveLocal();
+    setSync('cloud');
+    render();
+    push.forEach(queueWrite);
+  },function(){setSync('local')});
+}
+if(window.claude&&window.claude.use){
+  window.claude.use('db').then(function(d){if(d)connect(d)},function(){});
+}
+
+/* ---------- queries ---------- */
+function slotsFor(i){return SLOTS.filter(function(s){return i>0||s.t>=FIRST_FROM})}
+function pillsFor(k,s){return s.pills.filter(function(p){return !p.from||k>=p.from})}
+function takenCount(k,s){var d=state.days[k]||{},c=0;pillsFor(k,s).forEach(function(p){if(d[s.id+'.'+p.p])c++});return c}
+function stateOf(k,s){var c=takenCount(k,s);return c===0?'none':(c===pillsFor(k,s).length?'done':'partial')}
+function takenInfo(k,s){
+  var d=state.days[k]||{},best='',later=false;
+  pillsFor(k,s).forEach(function(p){
+    var v=d[s.id+'.'+p.p];
+    if(v){var l=v.charAt(0)==='~',iso=l?v.slice(1):v;if(iso>best){best=iso;later=l}}
+  });
+  if(!best)return '';
+  var dt=new Date(best),same=keyOf(dt)===k;
+  if(!same)return 'סומן ב־'+ltr(shortDate(keyOf(dt)));
+  return (later?'סומן ב־':'נלקח ב־')+ltr(hm(dt));
+}
+
+/* ---------- actions ---------- */
+function todayKey(){return keyOf(new Date())}
+function put(k,s,ids,later){
+  var d=state.days[k]||(state.days[k]={});
+  var iso=(later?'~':'')+new Date().toISOString();
+  ids.forEach(function(id){var key=s.id+'.'+id;if(!d[key])d[key]=iso});
+}
+function drop(k,s,ids){
+  var d=state.days[k];if(!d)return;
+  ids.forEach(function(id){delete d[s.id+'.'+id]});
+}
+function commit(k){
+  if(!db)dirty[k]=true;
+  saveLocal();queueWrite(k);render();
+}
+function allIds(k,s){return pillsFor(k,s).map(function(p){return p.p})}
+function slotById(id){for(var i=0;i<SLOTS.length;i++)if(SLOTS[i].id===id)return SLOTS[i];return null}
+document.getElementById('root').addEventListener('click',function(e){
+  var tg=e.target;
+  try{var t0=tg.nodeType===3?tg.parentNode:tg;var a0=t0.closest&&t0.closest('[data-act]');dbg('tap: '+(a0?a0.getAttribute('data-act'):'no-act')+' db='+(db?'yes':'no'))}catch(x){}
+  if(tg&&tg.nodeType===3)tg=tg.parentNode;
+  var el=tg&&tg.closest?tg.closest('[data-act]'):null;
+  if(!el||el.disabled)return;
+  var act=el.getAttribute('data-act');
+  var card=el.closest('.slot');
+  var k=card?card.getAttribute('data-day'):null;
+  var s=card?slotById(card.getAttribute('data-slot')):null;
+  var later=k!==null&&k!==todayKey();
+
+  if(act==='tab'){tab=el.getAttribute('data-tab');armed=null;render();return}
+  if(act==='pickday'){sel=el.getAttribute('data-day');armed=null;render();return}
+  if(act==='exp'){var key=k+'|'+s.id;if(expanded[key])delete expanded[key];else expanded[key]=1;render();return}
+  if(act==='pill'){
+    var id=el.getAttribute('data-pill'),has=state.days[k]&&state.days[k][s.id+'.'+id];
+    if(has)drop(k,s,[id]);else{put(k,s,[id],later);recent[k+'|'+s.id]=1}
+    commit(k);return;
+  }
+  if(act==='all'){put(k,s,allIds(k,s),later);recent[k+'|'+s.id]=1;commit(k);return}
+  if(act==='undo'){drop(k,s,allIds(k,s));commit(k);return}
+});
+
+/* ---------- rendering ---------- */
+var CHECK='<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var CHEV='<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+function tile(P){
+  var h='';for(var i=0;i<P.n;i++)h+='<svg viewBox="0 0 48 48" aria-hidden="true"><use href="#ic-'+P.icon+'"/></svg>';
+  return '<span class="tile">'+h+'</span>';
+}
+function pillRow(k,s,pp,ro){
+  var P=PILLS[pp.p],on=!!(state.days[k]&&state.days[k][s.id+'.'+pp.p]);
+  var chips=(pp.notes||[]).map(function(n){return '<span class="chip">'+n+'</span>'}).join('');
+  return '<button class="pill'+(on?' on':'')+'" data-act="pill" data-pill="'+pp.p+'" aria-pressed="'+on+'"'+(ro?' disabled':'')+'>'
+    +tile(P)
+    +'<span class="ptxt"><span class="pn">'+P.name+'</span><span class="pd">'+P.dose+'</span>'+(chips?'<span class="chips">'+chips+'</span>':'')+'</span>'
+    +'<span class="chk" aria-hidden="true">'+CHECK+'</span></button>';
+}
+function slotCard(k,s,o){
+  var st=stateOf(k,s),key=k+'|'+s.id,open=!!(o.full||expanded[key]);
+  var cls='slot'+(st==='done'?' done':'')+(o.due?' due':'')+(open?' open':'');
+  var sub='',end='';
+  if(st==='done')sub=takenInfo(k,s);
+  else{
+    if(st==='partial')sub='נלקחו '+takenCount(k,s)+' מתוך '+pillsFor(k,s).length;
+    if(o.minsAgo!=null)end='<span class="badge">'+(o.minsAgo<=20?'עכשיו':'לפני '+dur(o.minsAgo))+'</span>';
+    else if(o.minsTo!=null)end='<span>בעוד '+dur(o.minsTo)+'</span>';
+  }
+  var gl='<span class="gl">'+(st==='done'?CHECK:'<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#ic-'+glyph(s.t)+'"/></svg>')+'</span>';
+  var headInner=gl+'<span class="meta"><span class="time" dir="ltr">'+s.t+'</span><span class="lbl">'+s.label+'</span>'+(sub?'<span class="sub">'+sub+'</span>':'')+'</span><span class="end">'+end+(o.full?'':CHEV)+'</span>';
+  var head=o.full?'<div class="head">'+headInner+'</div>':'<button class="head" data-act="exp" aria-expanded="'+open+'">'+headInner+'</button>';
+  var body='';
+  if(open){
+    body='<div class="pills">'+pillsFor(k,s).map(function(pp){return pillRow(k,s,pp,o.ro)}).join('')+'</div>';
+    if(!o.ro){
+      body+='<div class="foot">'+(st==='done'
+        ?'<button class="link" data-act="undo">ביטול סימון</button>'
+        :'<button class="btn" data-act="all">'+(st==='partial'?'לקחתי את השאר':'לקחתי הכול')+'</button>')+'</div>';
+    }
+  }
+  return '<article class="'+cls+'" data-day="'+k+'" data-slot="'+s.id+'">'+head+body+'</article>';
+}
+
+function header(n,tk,idx){
+  var big,small='';
+  if(idx<0)big='בקרוב';
+  else if(idx>=DAYS)big='הסתיים';
+  else{big='יום '+(idx+1);small='מתוך '+DAYS}
+  var date;
+  try{date=n.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long'})}catch(e){date=tk}
+  var h=n.getHours();
+  var greet=h<5?'לילה טוב':(h<12?'בוקר טוב':(h<17?'צהריים טובים':(h<21?'ערב טוב':'לילה טוב')));
+  var cnt='';
+  if(idx>=0&&idx<DAYS){
+    var sl=slotsFor(idx),d=sl.filter(function(s){return stateOf(tk,s)==='done'}).length;
+    cnt='<div class="cnt">סומנו '+d+' מתוך '+sl.length+'</div>';
+  }
+  return '<div class="top"><div><div class="greet">'+greet+'</div><div><span class="day-no">'+big+'</span>'+(small?'<span class="day-of">'+small+'</span>':'')+'</div><div class="date">'+date+'</div></div><div><div class="clock" dir="ltr">'+hm(n)+'</div>'+cnt+'</div></div>';
+}
+function tabs(idx){
+  function b(id,t,extra){return '<button role="tab" data-act="tab" data-tab="'+id+'" aria-selected="'+(tab===id)+'">'+t+(extra||'')+'</button>'}
+  var mc=missedCount(idx);
+  var badge=mc?'<span class="mb" role="img" aria-label="'+mc+' מועדים לא מסומנים בימים קודמים">'+mc+'</span>':'';
+  return '<div class="seg" role="tablist">'+b('now','היום')+b('days','היסטוריה',badge)+'</div>';
+}
+function missedCount(idx){
+  var lim=Math.min(idx,DAYS),count=0;
+  for(var i=0;i<lim;i++){
+    var k=dayKeyAt(i);
+    slotsFor(i).forEach(function(s){if(stateOf(k,s)!=='done')count++});
+  }
+  return count;
+}
+function viewNow(n,tk,idx){
+  var out='';
+  if(idx<0)return out+'<div class="note"><b>הטיפול עוד לא התחיל</b>הוא מתחיל ב־'+ltr(shortDate(START))+'.</div>';
+  if(idx>=DAYS)return out+'<div class="note"><b>הטיפול הסתיים</b>אפשר לעבור על כל הימים בלשונית ״היסטוריה״.</div>';
+  var slots=slotsFor(idx),nt=hm(n),nm=mins(nt);
+  var due=slots.filter(function(s){return s.t<=nt&&(stateOf(tk,s)!=='done'||recent[tk+'|'+s.id])});
+  var pend=due.filter(function(s){return stateOf(tk,s)!=='done'});
+  var next=null;
+  for(var i=0;i<slots.length;i++){if(slots[i].t>nt&&stateOf(tk,slots[i])!=='done'){next=slots[i];break}}
+  if(!pend.length){
+    if(next)out+='<div class="note"><b>הכול מסומן עד עכשיו</b>המועד הבא ב־'+ltr(next.t)+'.</div>';
+    else if(idx<DAYS-1)out+='<div class="note"><b>סיימת להיום</b>מחר מתחילים ב־'+ltr(slotsFor(idx+1)[0].t)+'.</div>';
+    else out+='<div class="note"><b>סיימת להיום</b>זה היה היום האחרון של הטיפול.</div>';
+  }
+  if(due.length){
+    out+='<div class="stack lead">';
+    due.forEach(function(s){
+      var ok=stateOf(tk,s)==='done',ago=nm-mins(s.t);
+      out+=slotCard(tk,s,{full:!ok,due:!ok,minsAgo:ok?null:ago});
+    });
+    out+='</div>';
+  }
+  if(next){
+    out+='<div class="sec"><h2>הבא</h2></div><div class="stack">'+slotCard(tk,next,{full:false,minsTo:mins(next.t)-nm})+'</div>';
+  }
+  return out;
+}
+
+function viewDays(n,tk,idx){
+  var cur=Math.max(0,Math.min(idx,DAYS-1));
+  if(!sel||dayIdx(sel)<0||dayIdx(sel)>=DAYS)sel=dayKeyAt(cur);
+  var strip='<div class="strip">';
+  for(var i=0;i<DAYS;i++){
+    var k=dayKeyAt(i),sl=slotsFor(i),d=sl.filter(function(s){return stateOf(k,s)==='done'}).length;
+    var c=i>idx?'future':(d===sl.length?'full':(i===idx?'':'missed'));
+    if(i===idx)c+=' today';
+    strip+='<button class="dc '+c+'" data-act="pickday" data-day="'+k+'" aria-pressed="'+(k===sel)+'"><span class="n">'+(i+1)+'</span><span class="d">'+ltr(shortDate(k))+'</span><span class="c">'+(i>idx?'':ltr(d+'/'+sl.length))+'</span></button>';
+  }
+  strip+='</div>';
+  var si=dayIdx(sel),future=si>idx,sk=sel,ss=slotsFor(si);
+  var done=ss.filter(function(s){return stateOf(sk,s)==='done'}).length;
+  var dd;
+  try{dd=parseKey(sk).toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long'})}catch(e){dd=sk}
+  var out=strip+'<div class="dayhead"><h2>יום '+(si+1)+'</h2><p>'+dd+(future?'':' · '+done+' מתוך '+ss.length+' מועדים')+'</p></div>';
+  out+='<div class="stack">';
+  ss.forEach(function(s){
+    var st=stateOf(sk,s);
+    out+=slotCard(sk,s,{full:!future&&st!=='done',ro:future});
+  });
+  return out+'</div>';
+}
+
+function render(){
+  var n=new Date(),tk=keyOf(n),idx=dayIdx(tk);
+  lastSig=tk+hm(n);
+  var hh=header(n,tk,idx);
+  var rr=tabs(idx)+(tab==='now'?viewNow(n,tk,idx):viewDays(n,tk,idx))
+    +'<div class="fine"><p>האיורים להמחשה בלבד ועשויים להיות שונים מהכדורים שלך. ההוראות של הרופא או הרוקח קודמות לכל מה שמופיע כאן.</p><p id="sync">'+syncText()+'</p><p id="err"></p></div>';
+  if(hh!==lastHead){document.getElementById('head').innerHTML=hh;lastHead=hh}
+  if(rr!==lastRoot){document.getElementById('root').innerHTML=rr;lastRoot=rr}
+}
+window.addEventListener('error',function(ev){var x=document.getElementById('err');if(x)x.textContent='שגיאה: '+(ev&&ev.message)});
+render();
+setInterval(function(){var n=new Date();if(keyOf(n)+hm(n)!==lastSig)render()},30000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden)render()});
+})();
+</script>
+
+</body></html>
